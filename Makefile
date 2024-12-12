@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -lglfw -lGL -lm
+CXXFLAGS = -lglfw -lGL -lm -lGLEW
 TARGET = window
 SRC = main.cpp
 
