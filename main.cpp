@@ -2,9 +2,31 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
+#include <csignal>
 #include <fstream>
 #include <string>
 #include <sstream>
+
+#define ASSERT(x) if (!(x)) raise(SIGTRAP); // macro
+#define GLCall(x) GLClearError();\
+    x;\
+    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line) 
+{
+    while (GLenum error = glGetError())
+    {
+        std::cout<< "[OpenGL Error] (" << error << ") " << function << " "
+        << file << " " << line << std::endl;
+        return false;
+    }
+    return true;
+}
 
 struct ShaderProgramSource
 {
@@ -108,6 +130,8 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
     if (glewInit() != GLEW_OK) // glewInit only after creating a valid openGL rendering context
     {
         std::cout << "Error initializing GLEW" << std::endl;
@@ -142,15 +166,30 @@ int main(void)
     ShaderProgramSource source = ParseShader("./basic.shader");
 
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    glUseProgram(shader);
+    glUseProgram(shader); // bound shader
 
+    int location = glGetUniformLocation(shader, "u_Color");
+    ASSERT(location != -1);
+    glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f);
+
+    float r = 0.0f;
+    float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) // render loop (like game loop)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); // null as already bound
+        // error handling using the defined macros and functions
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // null as already bound
+
+        glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
+        if (r > 1.0f)
+            increment = -0.05f;
+        else if (r < 0.0f)
+            increment = 0.05f;
+
+        r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
