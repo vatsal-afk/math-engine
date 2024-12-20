@@ -12,44 +12,73 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
-struct ShaderProgramSource
+
+const char* vertexShaderSource = R"(
+#version 100
+
+attribute vec4 position;
+
+void main()
 {
-    std::string VertexSource;
-    std::string FragmentSource;
-};
-
-static ShaderProgramSource ParseShader(const std::string& filepath)
-{
-    std::ifstream stream(filepath);
-
-    enum class ShaderType
-    {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
-    };
-
-    std::string line;
-    std::stringstream ss[2];
-    ShaderType type = ShaderType::NONE;
-    while (getline(stream, line))
-    {
-        if(line.find("#shader") != std::string::npos)
-        {
-            if(line.find("vertex") != std::string::npos)
-            {
-                type = ShaderType::VERTEX;
-            }
-            else if(line.find("fragment") != std::string::npos)
-            {
-                type = ShaderType::FRAGMENT;
-            }
-        }
-        else
-        {
-            ss[(int)type] << line << '\n';
-        }
-    }
-    return { ss[0].str(), ss[1].str() };
+   gl_Position = position;
 }
+)";
+
+
+const char* fragmentShaderSource = R"(
+#version 100
+
+precision mediump float;
+
+uniform vec4 u_Color;
+
+void main()
+{
+   gl_FragColor = u_Color;
+}
+)";
+
+
+
+
+// struct ShaderProgramSource
+// {
+//     std::string VertexSource;
+//     std::string FragmentSource;
+// };
+
+// static ShaderProgramSource ParseShader(const std::string& filepath)
+// {
+//     std::ifstream stream(filepath);
+
+//     enum class ShaderType
+//     {
+//         NONE = -1, VERTEX = 0, FRAGMENT = 1
+//     };
+
+//     std::string line;
+//     std::stringstream ss[2];
+//     ShaderType type = ShaderType::NONE;
+//     while (getline(stream, line))
+//     {
+//         if(line.find("#shader") != std::string::npos)
+//         {
+//             if(line.find("vertex") != std::string::npos)
+//             {
+//                 type = ShaderType::VERTEX;
+//             }
+//             else if(line.find("fragment") != std::string::npos)
+//             {
+//                 type = ShaderType::FRAGMENT;
+//             }
+//         }
+//         else
+//         {
+//             ss[(int)type] << line << '\n';
+//         }
+//     }
+//     return { ss[0].str(), ss[1].str() };
+// }
 
 static unsigned int CompileShader(unsigned int type, const std::string& source)
 {
@@ -145,12 +174,44 @@ int main(void)
 
     IndexBuffer ib(indices, 6);
 
-    ShaderProgramSource source = ParseShader("./res/shaders/basic.shader"); //  filepath should be relative to the executable!!!
-    unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
+    // ShaderProgramSource source = ParseShader("./res/shaders/basic.shader"); //  filepath should be relative to the executable!!!
+    unsigned int shader = CreateShader(vertexShaderSource, fragmentShaderSource);
     //glUseProgram(shader); // bound shader
 
     int location = glGetUniformLocation(shader, "u_Color");
     ASSERT(location != -1);
+// static ShaderProgramSource ParseShader(const std::string& filepath)
+// {
+//     std::ifstream stream(filepath);
+
+//     enum class ShaderType
+//     {
+//         NONE = -1, VERTEX = 0, FRAGMENT = 1
+//     };
+
+//     std::string line;
+//     std::stringstream ss[2];
+//     ShaderType type = ShaderType::NONE;
+//     while (getline(stream, line))
+//     {
+//         if(line.find("#shader") != std::string::npos)
+//         {
+//             if(line.find("vertex") != std::string::npos)
+//             {
+//                 type = ShaderType::VERTEX;
+//             }
+//             else if(line.find("fragment") != std::string::npos)
+//             {
+//                 type = ShaderType::FRAGMENT;
+//             }
+//         }
+//         else
+//         {
+//             ss[(int)type] << line << '\n';
+//         }
+//     }
+//     return { ss[0].str(), ss[1].str() };
+// }
     glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f);
 
     // ------
