@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <bits/stdc++.h>
 
 #define ASSERT(x) if (!(x)) raise(SIGTRAP); // macro
 #define GLCall(x) GLClearError();\
@@ -111,6 +112,26 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     return program;
 }
 
+struct vertices
+{
+    std::pair<float,float> v1;
+    std::pair<float,float> v2;
+    std::pair<float,float> v3;
+};
+
+static vertices sierpiński(std::vector<float> vertices)
+{
+    std::pair<float,float> v0 = {vertices[0], vertices[1]};
+    std::pair<float,float> v1 = {vertices[2], vertices[3]};
+    std::pair<float,float> v2 = {vertices[4], vertices[5]};
+
+    return {
+        {(v0.first + v1.first) / 2,(v0.second + v1.second) / 2},
+        {(v1.first + v2.first) / 2,(v1.second + v2.second) / 2},
+        {(v2.first + v0.first) / 2,(v2.second + v0.second) / 2}
+    };
+}
+
 int main(void)
 {
     GLFWwindow* window;
@@ -120,7 +141,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "sierpiński", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -138,58 +159,84 @@ int main(void)
         return -1;
     }
 
-    float positions[] = {
-       -0.5f, -0.5f, // 0
-        0.5f, 0.5f,  // 1
-        0.5f, -0.5f, // 2
-       -0.5f, 0.5f   // 3
+    std::vector<float> positions = { // !
+        -0.5f, -0.5f, // 0
+         0.0f, 0.5f,  // 1
+         0.5f, -0.5f, // 2
+       //-0.5f, 0.5f   // 3
     };
 
-    unsigned int indices[] = { // tho int are 4 bytes, can use char or short
-        2,1,0,
-        0,3,1
-    } ;
+    // unsigned int indices[] = { // tho int are 4 bytes, can use char or short // !
+    //     0,1,2,
+    //     //0,3,1
+    // } ;
 
     unsigned int buffer;
     glGenBuffers(1, &buffer); // an id for the object, hence the pointer
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 2 *  sizeof(float), positions, GL_STATIC_DRAW); // this size is in bytes
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_DYNAMIC_DRAW); // this size is in bytes // !
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-    unsigned int ibo; // index buffer object
-    glGenBuffers(1, &ibo); // an id for the object, hence the pointer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    // unsigned int ibo; // index buffer object
+    // glGenBuffers(1, &ibo); // an id for the object, hence the pointer
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW); // !
 
-    ShaderProgramSource source = ParseShader("./basic.shader");
+    ShaderProgramSource source = ParseShader("./sierpiński.shader");
 
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
     glUseProgram(shader); // bound shader
 
     int location = glGetUniformLocation(shader, "u_Color");
     ASSERT(location != -1);
-    glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f);
+    glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
 
-    float r = 0.0f;
-    float increment = 0.05f;
+    vertices vrtx = sierpiński(positions);
+
+    positions.push_back(vrtx.v1.first);
+    positions.push_back(vrtx.v1.second);
+
+    positions.push_back(vrtx.v2.first);
+    positions.push_back(vrtx.v2.second);
+
+    positions.push_back(vrtx.v3.first);
+    positions.push_back(vrtx.v3.second);
+
+    for(auto v: positions)
+    {
+        std::cout<<v<<std::endl;
+    }
+    // float r = 0.0f;
+    // float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) // render loop (like game loop)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_DYNAMIC_DRAW); // this size is in bytes // !
+
+        glDrawArrays(GL_TRIANGLES, 0, positions.size() / 2);
+
+        if(positions.size() >= 6)
+        {
+            glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        }
+        
         // error handling using the defined macros and functions
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // null as already bound
+        //GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // null as already bound
 
-        glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
-        if (r > 1.0f)
-            increment = -0.05f;
-        else if (r < 0.0f)
-            increment = 0.05f;
+        // glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
+        // if (r > 1.0f)
+        //     increment = -0.05f;
+        // else if (r < 0.0f)
+        //     increment = 0.05f;
 
-        r += increment;
+        // r += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
