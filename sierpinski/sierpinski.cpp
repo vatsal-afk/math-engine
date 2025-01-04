@@ -54,7 +54,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(640, 480, "sierpiński", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "sierpinski", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -78,11 +78,11 @@ int main(void)
     float p2[2] = {0.0f, 0.5f};
 
     // Depth of recursion ( 11 or 12 gives kinda sax result)
-    int depth = 12;
+    int depth = 10;
 
     generateSierpinski(vertices, p0, p1, p2, depth);
-    generateSierpinski(vertices, p1, p2, p0, depth);
-    generateSierpinski(vertices, p2, p0, p1, depth);
+    // generateSierpinski(vertices, p1, p2, p0, depth);
+    // generateSierpinski(vertices, p2, p0, p1, depth);
 
     // Create and compile the vertex shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -152,7 +152,8 @@ int main(void)
 
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_LINES, 0, vertices.size() / 2);  // Draw the pattern as lines
+        // glDrawArrays(GL_LINES, 0, vertices.size() / 2);  // Draw the pattern as lines
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 2);  // Draw the pattern as lines
 
         glfwSwapBuffers(window);
         glfwPollEvents();

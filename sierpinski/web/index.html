@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sierpiński Triangle</title>
+</head>
+<body>
+    <center>
+        <canvas id="canvas" width="800" height="600" oncontextmenu="event.preventDefault()"></canvas>
+        <script>
+            var Module = {
+                canvas: (function() { return document.getElementById('canvas'); })(),
+                onRuntimeInitialized: function() {
+                    console.log('WASM runtime initialized.');
+                }
+            };
+        </script>
+        <script src="index.js"></script>
+    </center>
+</body>
+</html>
