@@ -1,4 +1,4 @@
-# include <GL/glew.h>
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
@@ -11,6 +11,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 struct ShaderProgramSource
 {
@@ -18,13 +19,15 @@ struct ShaderProgramSource
     std::string FragmentSource;
 };
 
-static ShaderProgramSource ParseShader(const std::string& filepath)
+static ShaderProgramSource ParseShader(const std::string &filepath)
 {
     std::ifstream stream(filepath);
 
     enum class ShaderType
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
     };
 
     std::string line;
@@ -32,13 +35,13 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
     ShaderType type = ShaderType::NONE;
     while (getline(stream, line))
     {
-        if(line.find("#shader") != std::string::npos)
+        if (line.find("#shader") != std::string::npos)
         {
-            if(line.find("vertex") != std::string::npos)
+            if (line.find("vertex") != std::string::npos)
             {
                 type = ShaderType::VERTEX;
             }
-            else if(line.find("fragment") != std::string::npos)
+            else if (line.find("fragment") != std::string::npos)
             {
                 type = ShaderType::FRAGMENT;
             }
@@ -48,28 +51,28 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
             ss[(int)type] << line << '\n';
         }
     }
-    return { ss[0].str(), ss[1].str() };
+    return {ss[0].str(), ss[1].str()};
 }
 
-static unsigned int CompileShader(unsigned int type, const std::string& source)
+static unsigned int CompileShader(unsigned int type, const std::string &source)
 {
     unsigned int id = glCreateShader(type);
-    const char* src = &source[0]; // source.c_str();
+    const char *src = &source[0]; // source.c_str();
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
 
     // Error Handling
     int result;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if(result == GL_FALSE)
+    if (result == GL_FALSE)
     {
         int length;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char* message = (char*)alloca(length * sizeof(char)); // allocate on stack here instead of heap
+        char *message = (char *)alloca(length * sizeof(char)); // allocate on stack here instead of heap
         glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile " 
-        << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") 
-        << " shader!" << std::endl;
+        std::cout << "Failed to compile "
+                  << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
+                  << " shader!" << std::endl;
         std::cout << message << std::endl;
         glDeleteShader(id);
         return 0;
@@ -78,7 +81,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
     return id;
 }
 
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+static unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader)
 {
     unsigned int program = glCreateProgram();
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
@@ -97,7 +100,7 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 
 int main(void)
 {
-    GLFWwindow* window;
+    GLFWwindow *window;
 
     /* Initialize the library */
     if (!glfwInit())
@@ -123,36 +126,32 @@ int main(void)
     }
 
     float positions[] = {
-       -0.5f, -0.5f, // 0
-        0.5f, 0.5f,  // 1
-        0.5f, -0.5f, // 2
-       -0.5f, 0.5f   // 3
+        -0.5f, -0.5f, // 0
+        0.5f, 0.5f,   // 1
+        0.5f, -0.5f,  // 2
+        -0.5f, 0.5f   // 3
     };
 
-    unsigned int indices[] = { // tho int are 4 bytes, can use char or short
-        2,1,0,
-        0,3,1
-    } ;
+    unsigned int indices[] = {// tho int are 4 bytes, can use char or short
+                              2, 1, 0,
+                              0, 3, 1};
 
-    unsigned int vao; // vertex attribute object
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // unsigned int vao; // vertex attribute object
+    // glGenVertexArrays(1, &vao);
+    // glBindVertexArray(vao);
 
-    // VertexArray va;
-    VertexBuffer vb(positions, 4 * 2 *  sizeof(float));
-    // va.AddBuffer(vb);
-    // BufferLayout layout;
-    // layout.Push<float>(3);
-    // va.AddLayout(layout);
+    VertexArray va;
+    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    VertexBufferLayout layout;
+    layout.Push(GL_FLOAT, 2);
+    va.AddBuffer(vb, layout);
 
     IndexBuffer ib(indices, 6);
 
     ShaderProgramSource source = ParseShader("./res/shaders/basic.shader"); //  filepath should be relative to the executable!!!
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    //glUseProgram(shader); // bound shader
+    // glUseProgram(shader); // bound shader
 
     int location = glGetUniformLocation(shader, "u_Color");
     ASSERT(location != -1);
@@ -175,9 +174,9 @@ int main(void)
         // ------
         glUseProgram(shader); // bound shader
         glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
-        
-        glBindVertexArray(vao);
-        // va.Bind();
+
+        // glBindVertexArray(vao);
+        va.Bind();
         ib.Bind();
         // -------
 
