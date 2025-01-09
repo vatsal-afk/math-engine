@@ -1,0 +1,174 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+header .search {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+header input[type="text"] {
+    margin-left: 10px;
+    padding: 4px;
+    font-size: 1rem;
+    width: 200px;
+}
+
+header button {
+    background-color: #555;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+}
+
+header button:hover {
+    background-color: #444;
+}
+
+/* Main Grid Layout */
+.grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Master and Other Patterns Layout */
+.master, .other-patterns {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: space-between; /* Distribute tiles evenly */
+}
+
+/* Tile Styles */
+.master-tile{
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    margin: 10px; /* Ensures tiles don't touch each other */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tile {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 20%;
+    margin: 10px; /* Ensures tiles don't touch each other */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect for tiles */
+.master-tile:hover, .tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Tile Image */
+.master-tile img, .tile img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+/* Text Styling */
+.master-tile p, .tile p {
+    font-size: 1rem;
+    margin-top: 15px;
+    color: #444;
+    line-height: 1.4;
+}
+
+.master-tile a, .tile a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: color 0.3s ease;
+}
+
+.master-tile a:hover, .tile a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: auto;
+}
+
+footer h3 {
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Responsive Styles for Smaller Screens */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.2rem; /* Adjust header size for smaller screens */
+    }
+
+    header input[type="text"] {
+        width: 150px; /* Smaller search bar */
+    }
+
+    .grid {
+        padding: 10px;
+    }
+
+    .master, .other-patterns {
+        flex-direction: column; /* Stack tiles vertically on smaller screens */
+        align-items: center;
+    }
+
+    .master-tile, .tile {
+        max-width: 100%; /* Full width on small screens */
+        margin: 10px 0; /* Adjust margin for smaller devices */
+    }
+}
+
