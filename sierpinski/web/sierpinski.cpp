@@ -85,7 +85,7 @@ int main() {
     float p0[2] = { -0.5f, -0.5f };
     float p1[2] = { 0.5f, -0.5f };
     float p2[2] = { 0.0f, 0.5f };
-    int depth = 10;
+    int depth = 2;
     generateSierpinski(state.vertices, p0, p1, p2, depth);
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

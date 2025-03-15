@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/virtual/Downloads/emsdk/upstream/emscripten/system/include",
+                "/home/virtual/Downloads/emsdk/upstream/emscripten/system/include/libc"
+            ],
+            "defines": ["EMSCRIPTEN"],
+            "compilerPath": "/home/virtual/Downloads/emsdk/upstream/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-clang-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}

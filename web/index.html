@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sierpiński Triangle</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000; /* Optional: Set a dark background for better contrast */
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        // Set canvas size dynamically
+        const canvas = document.getElementById('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Prevent right-click context menu on canvas
+        canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+
+        // WebAssembly Module
+        var Module = {
+            canvas: canvas, // Use the dynamically sized canvas
+            onRuntimeInitialized: function() {
+                console.log('WASM runtime initialized.');
+                // You can call exported WASM functions here
+            }
+        };
+    </script>
+    <!-- WASM glue code -->
+    <script src="index.js"></script>
+</body>
+</html>
